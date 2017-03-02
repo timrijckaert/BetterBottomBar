@@ -1,0 +1,46 @@
+## ANDROID
+
+# built application files
+*.ap_
+
+# files for the dex VM
+*.dex
+
+# Java class files
+*.class
+
+# generated files
+bin/
+gen/
+out/
+build/
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# IDEA/Android Studio project files
+# the project can be imported from settings.gradle
+.idea
+*.iml
+*.ipr
+*.iws
+
+# Local IDEA workspace
+.idea/workspace.xml
+
+.gradle
+/local.properties
+/.idea/workspace.xml
+/.idea/libraries
+.DS_Store
+/build
+output
+
+# Gradle cache
+.gradle
+
+# Crashlytics
+com_crashlytics_export_strings.xml
+crashlytics-build.properties
+
+http

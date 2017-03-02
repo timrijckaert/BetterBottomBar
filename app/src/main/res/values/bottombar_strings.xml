@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="news_title">nieuws</string>
+    <string name="video_title">video</string>
+    <string name="discover_title">ontdek</string>
+</resources>
