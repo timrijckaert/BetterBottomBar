@@ -1,71 +1,87 @@
 package tim.rijckaert.be.betterbottombar
 
+import android.animation.Animator
 import android.annotation.SuppressLint
 import android.content.Context
+import android.graphics.Rect
 import android.support.design.internal.BottomNavigationItemView
 import android.support.design.widget.BottomNavigationView
 import android.util.AttributeSet
 import android.view.View
+import android.view.ViewAnimationUtils.createCircularReveal
 import android.view.ViewGroup
-import org.jetbrains.anko.*
+import org.jetbrains.anko.backgroundColor
+import org.jetbrains.anko.childrenSequence
+import org.jetbrains.anko.dip
 
 @SuppressLint("NewApi")
-class BottomNavigationView : BottomNavigationView {
+class BottomNavigationView @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0)
+    : BottomNavigationView(context, attrs, defStyle) {
 
-    private var heightMeasureSpec: Int = 0
-    private var widthMeasureSpec: Int = 0
-    val overLayView
-        get() = this.context.UI {
-                view {
-                    layoutParams = android.view.ViewGroup.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, dip(57).toInt())
+    private var overlayView: View? = null
+        get() {
+            removeView(field)
+
+            if (field == null) {
+                field = View(context).apply {
                     backgroundColor = android.graphics.Color.BLACK
+                    layoutParams = android.view.ViewGroup.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, dip(BOTTOM_BAR_HEIGHT_DP).toInt())
                 }
+            }
 
-        }.view
+            addView(field, 0)
+            return field
+        }
 
-    constructor(context: Context) : this(context, null)
-    constructor(context: Context, attrs: AttributeSet?) : this(context, attrs, 0)
-    constructor(context: Context, attrs: AttributeSet?, defStyle: Int) : super(context, attrs, defStyle) {
+    private val CENTER_Y by lazy { height / 2 }
+    private val BOTTOM_BAR_HEIGHT_DP = 56
+    private val ANIMATION_DURATION = 6000L
+    private val START_RADIUS = 0F
+    private val ACCESSIBILITY_VIEW = "mItemData"
+
+    init {
         setWillNotDraw(true)
         prepareBottomNavigationItems()
     }
 
-
-    override fun onMeasure(rawWidth: Int, rawHeight: Int) {
-        super.onMeasure(rawWidth, rawHeight)
-
-        widthMeasureSpec = View.MeasureSpec.makeMeasureSpec(measuredWidth - paddingLeft - paddingRight, View.MeasureSpec.EXACTLY)
-        heightMeasureSpec = View.MeasureSpec.makeMeasureSpec(measuredHeight - paddingTop - paddingBottom, View.MeasureSpec.EXACTLY)
-
-        overLayView.measure(widthMeasureSpec, heightMeasureSpec)
-    }
-
     private fun prepareBottomNavigationItems() {
-        val bottomNavigationItemViews =
+        val viewGroup =
                 getAllViewGroups()
                         .filter { it is BottomNavigationItemView }
                         .filterNotNull()
 
-        bottomNavigationItemViews.forEachIndexed { index, item ->
-            setContentDescription(bottomNavigationItemViews.size, index, item as BottomNavigationItemView)
-            item.setOnClickListener {
-                announceForAccessibility(it)
-                doColorAnimation()
+        viewGroup.forEachIndexed { index, btmNavItem ->
+            setContentDescription(viewGroup.size, index, btmNavItem as BottomNavigationItemView)
+            btmNavItem.setOnClickListener {
+                announceForAccessibility(it.contentDescription)
+                createRevealAnimator(it)
+                        .start()
             }
         }
     }
 
-    private fun doColorAnimation() {
-        addView(overLayView, 0)
+    private fun createRevealAnimator(clickedView: View): Animator {
+        val clickedViewRectXPos = Rect()
+        clickedView.getGlobalVisibleRect(clickedViewRectXPos)
+        val x = clickedViewRectXPos.left
+
+        return createCircularReveal(
+                overlayView,
+                x + (clickedView.width / 2),
+                CENTER_Y,
+                START_RADIUS,
+                width.toFloat()
+        ).apply { duration = ANIMATION_DURATION }
     }
 
-    private fun setContentDescription(amountOfBottomNavigationItemViews: Int, index: Int, bottomNavigationItemView: BottomNavigationItemView) {
-        bottomNavigationItemView.javaClass.getDeclaredField("mItemData").isAccessible = true
-        bottomNavigationItemView.contentDescription = "${bottomNavigationItemView.itemData.title} tab ${index + 1} van $amountOfBottomNavigationItemViews ${if (bottomNavigationItemView.isSelected) "geselecteerd" else ""}"
-    }
 
-    private fun announceForAccessibility(it: View) {
-        announceForAccessibility(it.contentDescription)
+    /**
+     * Yes yes I know it's dirty
+     * Fix your shit Google
+     */
+    private fun setContentDescription(amountOfBottomNavigationItemViews: Int, tabIndex: Int, btnItemView: BottomNavigationItemView) {
+        btnItemView.javaClass.getDeclaredField(ACCESSIBILITY_VIEW).isAccessible = true
+        btnItemView.contentDescription = "${btnItemView.itemData.title} tab ${tabIndex + 1} van $amountOfBottomNavigationItemViews ${if (btnItemView.isSelected) "geselecteerd" else ""}"
     }
 }
 
