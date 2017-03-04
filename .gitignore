@@ -35,6 +35,7 @@ local.properties
 .DS_Store
 /build
 output
+captures/
 
 # Gradle cache
 .gradle

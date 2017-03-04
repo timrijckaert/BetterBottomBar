@@ -8,14 +8,15 @@
     android:layout_height="match_parent"
     tools:context="tim.rijckaert.be.betterbottombar.MainActivity">
 
-    <android.support.design.widget.BottomNavigationView
+    <!--app:itemBackground="@color/colorAccent"-->
+
+    <tim.rijckaert.be.betterbottombar.BottomNavigationView
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/colorAccent"
         android:layout_alignParentBottom="true"
         android:layout_gravity="bottom"
-        app:itemBackground="@color/colorAccent"
         app:itemIconTint="@color/white"
         app:itemTextColor="@color/white"
         app:layout_behavior=".BottomNavigationBehavior"

@@ -106,7 +106,7 @@ public class RichBottomNavigationView extends BottomNavigationView {
 
         boolean previousHapticFeedbackEnabled = menuItemView.isHapticFeedbackEnabled();
         menuItemView.setSoundEffectsEnabled(false);
-        menuItemView.setHapticFeedbackEnabled(false); //avoid hearing click sounds, disable haptic and restore settings later of that view
+        menuItemView.setHapticFeedbackEnabled(false); //avoid hearing click sounds, disable haptic and restore settings later of that overLayView
         menuItemView.performClick();
         menuItemView.setHapticFeedbackEnabled(previousHapticFeedbackEnabled);
         menuItemView.setSoundEffectsEnabled(true);
