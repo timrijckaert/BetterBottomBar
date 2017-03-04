@@ -13,7 +13,6 @@ import android.view.View
 import android.view.ViewAnimationUtils.createCircularReveal
 import android.view.ViewGroup
 import org.jetbrains.anko.backgroundColor
-import org.jetbrains.anko.childrenSequence
 import org.jetbrains.anko.dip
 
 @SuppressLint("NewApi")
@@ -42,6 +41,10 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
             addView(field, INVALID_REFERENCE)
             return field
         }
+
+    private val SELECTED_ACC_TEXT by lazy { context.getString(R.string.acc_was_selected) }
+    private val TAB_ACC_TEXT by lazy { context.getString(R.string.acc_tab) }
+    private val OF_ACC_TEXT by lazy { context.getString(R.string.acc_of) }
 
     init {
         val styledAttributes = context.theme.obtainStyledAttributes(attrs, R.styleable.BetterBottomBar, INVALID_REFERENCE, INVALID_REFERENCE)
@@ -114,9 +117,9 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
             val btmNavItem = viewGroup as BottomNavigationItemView
 
             val title = getAccessibilityTitle(btmNavItem)
-            val isSelectedText = if (btmNavItem.isSelected || btmNavItem.itemPosition == selectedTabIndex) "geseleecteerd" else ""
+            val isSelectedText = if (btmNavItem.isSelected || btmNavItem.itemPosition == selectedTabIndex) SELECTED_ACC_TEXT else ""
 
-            btmNavItem.contentDescription = "$title tab ${btmNavItem.itemPosition + 1} van ${navigationItemViews.size} $isSelectedText"
+            btmNavItem.contentDescription = "$title $TAB_ACC_TEXT ${btmNavItem.itemPosition + 1} $OF_ACC_TEXT ${navigationItemViews.size} $isSelectedText"
         }
     }
 

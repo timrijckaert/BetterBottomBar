@@ -1,3 +1,5 @@
 <resources>
-    <string name="app_name">library</string>
+    <string name="acc_was_selected">selected</string>
+    <string name="acc_tab">tab</string>
+    <string name="acc_of">of</string>
 </resources>
