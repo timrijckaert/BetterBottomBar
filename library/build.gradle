@@ -27,17 +27,10 @@ android {
 }
 
 dependencies {
-    compile fileTree(dir: 'libs', include: ['*.jar'])
-    androidTestCompile('com.android.support.test.espresso:espresso-core:2.2.2', {
-        exclude group: 'com.android.support', module: 'support-annotations'
-    })
-
-    compile 'com.android.support:appcompat-v7:25.2.0'
-    compile "com.android.support:design:25.2.0"
-    compile "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
-
-    compile "org.jetbrains.anko:anko-sdk15:0.9"
-    compile "org.jetbrains.anko:anko-support-v4:0.9"
-    compile "org.jetbrains.anko:anko-appcompat-v7:0.9"
-    compile "org.jetbrains.anko:anko-design:0.9"
+    compile(
+            libraries.android_appcompat,
+            libraries.design_support,
+            libraries.kotlin,
+            libraries.anko
+    )
 }
