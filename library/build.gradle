@@ -1,4 +1,5 @@
 apply plugin: 'com.android.library'
+apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 25
@@ -22,11 +23,12 @@ android {
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
-        test.java.srcDirs += 'src/test/kotlin'
     }
 }
 
 dependencies {
+    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+
     compile(
             libraries.android_appcompat,
             libraries.design_support,

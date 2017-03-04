@@ -4,8 +4,9 @@ apply plugin: 'kotlin-android'
 android {
     compileSdkVersion 25
     buildToolsVersion "25.0.2"
+
     defaultConfig {
-        applicationId "tim.rijckaert.be.betterbottombar"
+        applicationId "be.rijckaert.tim.betterbottombar"
         minSdkVersion 16
         targetSdkVersion 25
         versionCode 1
@@ -21,11 +22,15 @@ android {
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
-        test.java.srcDirs += 'src/test/kotlin'
     }
 }
 
 dependencies {
+    compile(
+            libraries.android_appcompat,
+            libraries.kotlin
+    )
+
     compile project(':library')
 }
 

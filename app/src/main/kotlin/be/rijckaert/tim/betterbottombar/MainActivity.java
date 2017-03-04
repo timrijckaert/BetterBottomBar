@@ -1,4 +1,4 @@
-package tim.rijckaert.be.betterbottombar;
+package be.rijckaert.tim.betterbottombar;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
