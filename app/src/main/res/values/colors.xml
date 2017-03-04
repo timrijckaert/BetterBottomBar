@@ -4,5 +4,12 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
     <color name="white">#FFF</color>
-    <color name="screaminGreen">#5dfc71</color>
+    <color name="blackAsYourHeart">#212121</color>
+    <color name="someReddishColor">#d32f2f</color>
+
+    <array name="bottom_bar_colors">
+        <item>@color/colorPrimary</item>
+        <item>@color/someReddishColor</item>
+        <item>@color/blackAsYourHeart</item>
+    </array>
 </resources>
