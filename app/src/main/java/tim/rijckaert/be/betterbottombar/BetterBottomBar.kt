@@ -3,6 +3,7 @@ package tim.rijckaert.be.betterbottombar
 import android.animation.Animator
 import android.annotation.SuppressLint
 import android.content.Context
+import android.content.res.TypedArray
 import android.graphics.Color.*
 import android.graphics.Rect
 import android.support.design.internal.BottomNavigationItemView
@@ -24,10 +25,11 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
     private val ANIMATION_DURATION = 600L
     private val START_RADIUS = 0F
     private val ACCESSIBILITY_VIEW = "mItemData"
-    private val INVALID_COLOR_REFERENCE = 0
+    private val INVALID_REFERENCE = 0
 
     private var indexOfChild = 0
     private var colorIntArray = intArrayOf(RED, GREEN, BLUE, RED, GREEN, BLUE)
+    private var contentDescriptionTitles = emptyArray<String>()
     private var overlayView: View? = null
         get() {
             removeView(field)
@@ -37,23 +39,32 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
                 layoutParams = android.view.ViewGroup.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, dip(BOTTOM_BAR_HEIGHT_DP).toInt())
             }
 
-            addView(field, INVALID_COLOR_REFERENCE)
+            addView(field, INVALID_REFERENCE)
             return field
         }
 
     init {
-        initializeColors(attrs, context)
+        val styledAttributes = context.theme.obtainStyledAttributes(attrs, R.styleable.BetterBottomBar, INVALID_REFERENCE, INVALID_REFERENCE)
+        initializeColors(styledAttributes)
+        initializeAccessibilityTextTitles(styledAttributes)
+        styledAttributes.recycle()
+
         setWillNotDraw(true)
         prepareBottomNavigationItems()
     }
 
-    private fun initializeColors(attrs: AttributeSet?, context: Context) {
-        val styledAttributes = context.theme.obtainStyledAttributes(attrs, R.styleable.BetterBottomBar, INVALID_COLOR_REFERENCE, INVALID_COLOR_REFERENCE)
-        val colors = styledAttributes.getResourceId(R.styleable.BetterBottomBar_colors, INVALID_COLOR_REFERENCE)
-        if (colors != INVALID_COLOR_REFERENCE) {
+    private fun initializeAccessibilityTextTitles(styledAttributes: TypedArray) {
+        val titles = styledAttributes.getResourceId(R.styleable.BetterBottomBar_accessibilityTitles, INVALID_REFERENCE)
+        if (titles != INVALID_REFERENCE) {
+            contentDescriptionTitles = resources.getStringArray(titles)
+        }
+    }
+
+    private fun initializeColors(styledAttributes: TypedArray) {
+        val colors = styledAttributes.getResourceId(R.styleable.BetterBottomBar_colors, INVALID_REFERENCE)
+        if (colors != INVALID_REFERENCE) {
             colorIntArray = resources.getIntArray(colors)
         }
-        styledAttributes.recycle()
     }
 
     private fun prepareBottomNavigationItems() {
@@ -96,19 +107,26 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
         ).apply { duration = ANIMATION_DURATION }
     }
 
-    private fun indexOfClickedViewChild(clickedView: View) = (clickedView.parent as? ViewGroup)?.indexOfChild(clickedView) ?: INVALID_COLOR_REFERENCE
+    private fun indexOfClickedViewChild(clickedView: View) = (clickedView.parent as? ViewGroup)?.indexOfChild(clickedView) ?: INVALID_REFERENCE
 
     private fun setContentDescriptions(navigationItemViews: List<ViewGroup>, selectedTabIndex: Int = 0) {
-        navigationItemViews.forEachIndexed { tabIndex, viewGroup ->
+        navigationItemViews.forEach { viewGroup ->
             val btmNavItem = viewGroup as BottomNavigationItemView
-            btmNavItem.javaClass.getDeclaredField(ACCESSIBILITY_VIEW).isAccessible = true
 
-            val title = btmNavItem.itemData.title
-            val isSelectedText = if (btmNavItem.isSelected || tabIndex == selectedTabIndex) "geseleecteerd" else ""
+            val title = getAccessibilityTitle(btmNavItem)
+            val isSelectedText = if (btmNavItem.isSelected || btmNavItem.itemPosition == selectedTabIndex) "geseleecteerd" else ""
 
-            btmNavItem.contentDescription = "$title tab ${tabIndex + 1} van ${navigationItemViews.size} $isSelectedText"
+            btmNavItem.contentDescription = "$title tab ${btmNavItem.itemPosition + 1} van ${navigationItemViews.size} $isSelectedText"
         }
     }
+
+    fun getAccessibilityTitle(btmNavItem: BottomNavigationItemView): String =
+            if (contentDescriptionTitles.isNotEmpty()) {
+                contentDescriptionTitles[btmNavItem.itemPosition]
+            } else {
+                btmNavItem.javaClass.getDeclaredField(ACCESSIBILITY_VIEW).isAccessible = true
+                btmNavItem.itemData.title.toString()
+            }
 }
 
 //<editor-fold desc="Helper Shit ">

@@ -2,5 +2,6 @@
 <resources>
     <declare-styleable name="BetterBottomBar">
         <attr name="colors" format="reference" />
+        <attr name="accessibilityTitles" format="reference" />
     </declare-styleable>
 </resources>

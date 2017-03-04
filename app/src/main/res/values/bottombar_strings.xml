@@ -3,4 +3,10 @@
     <string name="news_title">nieuws</string>
     <string name="video_title">video</string>
     <string name="discover_title">ontdek</string>
+
+    <array name="better_bottom_bar_accessibility_title">
+        <item>@string/news_title</item>
+        <item>@string/video_title</item>
+        <item>@string/discover_title</item>
+    </array>
 </resources>

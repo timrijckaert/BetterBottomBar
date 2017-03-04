@@ -19,5 +19,6 @@
         app:itemTextColor="@color/white"
         app:colors="@array/bottom_bar_colors"
         app:layout_behavior=".BottomNavigationBehavior"
+        app:accessibilityTitles="@array/better_bottom_bar_accessibility_title"
         app:menu="@menu/bottom_navigation_main"/>
 </RelativeLayout>
