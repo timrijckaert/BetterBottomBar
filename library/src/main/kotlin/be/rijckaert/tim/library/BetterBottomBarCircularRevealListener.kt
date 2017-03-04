@@ -1,9 +1,10 @@
-package tim.rijckaert.be.betterbottombar
+package be.rijckaert.tim.library
 
 import android.animation.Animator
 import android.util.Log
 import android.view.View
 import org.jetbrains.anko.backgroundColor
+import be.rijckaert.tim.library.BetterBottomBar
 
 class BetterBottomBarCircularRevealListener(private val overlayView : View?,
                                             private val betterBottomBar: BetterBottomBar,

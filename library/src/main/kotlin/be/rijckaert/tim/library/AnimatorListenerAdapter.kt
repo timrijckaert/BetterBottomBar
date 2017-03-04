@@ -1,4 +1,4 @@
-package tim.rijckaert.be.betterbottombar
+package be.rijckaert.tim.library
 
 import android.animation.Animator
 

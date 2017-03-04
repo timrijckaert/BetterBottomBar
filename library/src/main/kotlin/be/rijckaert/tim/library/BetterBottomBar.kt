@@ -1,4 +1,4 @@
-package tim.rijckaert.be.betterbottombar
+package be.rijckaert.tim.library
 
 import android.animation.Animator
 import android.annotation.SuppressLint
@@ -36,7 +36,7 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
 
             field = View(context).apply {
                 backgroundColor = colorIntArray[indexOfChild]
-                layoutParams = android.view.ViewGroup.LayoutParams(android.view.ViewGroup.LayoutParams.MATCH_PARENT, dip(BOTTOM_BAR_HEIGHT_DP).toInt())
+                layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dip(BOTTOM_BAR_HEIGHT_DP).toInt())
             }
 
             addView(field, INVALID_REFERENCE)
@@ -128,20 +128,3 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
                 btmNavItem.itemData.title.toString()
             }
 }
-
-//<editor-fold desc="Helper Shit ">
-fun ViewGroup.getAllViewGroups(): List<ViewGroup> {
-    val innerChilds = mutableListOf<ViewGroup>()
-
-    fun getNestedViewGroup(view: View) {
-        if (view is ViewGroup) {
-            innerChilds.add(view)
-            val elements: List<ViewGroup> = view.getAllViewGroups()
-            innerChilds.addAll(elements)
-        }
-    }
-
-    this.childrenSequence().forEach(::getNestedViewGroup)
-    return innerChilds.filterNotNull()
-}
-//</editor-fold>
