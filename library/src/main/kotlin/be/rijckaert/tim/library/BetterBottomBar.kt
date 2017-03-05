@@ -6,12 +6,15 @@ import android.content.Context
 import android.content.res.TypedArray
 import android.graphics.Color.*
 import android.graphics.Rect
+import android.os.Bundle
+import android.os.Parcelable
 import android.support.design.internal.BottomNavigationItemView
 import android.support.design.widget.BottomNavigationView
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewAnimationUtils.createCircularReveal
 import android.view.ViewGroup
+import be.rijckaert.tim.library.AnimatorListenerAdapter.Companion.withCircularRevealListener
 import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.dip
 
@@ -19,28 +22,31 @@ import org.jetbrains.anko.dip
 class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0)
     : BottomNavigationView(context, attrs, defStyle) {
 
-    private val CENTER_Y by lazy { height / 2 }
     private val BOTTOM_BAR_HEIGHT_DP = 56
-    private val ANIMATION_DURATION = 600L
+    private val ANIMATION_DURATION = 300L
     private val START_RADIUS = 0F
     private val ACCESSIBILITY_VIEW = "mItemData"
     private val INVALID_REFERENCE = 0
+    private val SELECTED_TAB_INDEX = "be.rijckaert.tim.library.BetterBottomBar.SELECTED_TAB_INDEX"
 
-    private var indexOfChild = 0
     private var colorIntArray = intArrayOf(RED, GREEN, BLUE, RED, GREEN, BLUE)
     private var contentDescriptionTitles = emptyArray<String>()
     private var overlayView: View? = null
         get() {
-            removeView(field)
+            if (field != null) {
+                return field
+            }
 
             field = View(context).apply {
-                backgroundColor = colorIntArray[indexOfChild]
+                backgroundColor = colorIntArray[selectedTab]
                 layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dip(BOTTOM_BAR_HEIGHT_DP).toInt())
             }
 
             addView(field, INVALID_REFERENCE)
             return field
         }
+    var selectedTab = 0
+        private set
 
     private val SELECTED_ACC_TEXT by lazy { context.getString(R.string.acc_was_selected) }
     private val TAB_ACC_TEXT by lazy { context.getString(R.string.acc_tab) }
@@ -54,6 +60,18 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
 
         setWillNotDraw(true)
         prepareBottomNavigationItems()
+    }
+
+    override fun onSaveInstanceState(): Parcelable {
+        super.onSaveInstanceState()
+        return Bundle().apply { putInt(SELECTED_TAB_INDEX, selectedTab) }
+    }
+
+    override fun onRestoreInstanceState(state: Parcelable?) {
+        super.onRestoreInstanceState(null)
+        selectedTab = (state as Bundle).getInt(SELECTED_TAB_INDEX)
+        prepareBottomNavigationItems()
+        setBackgroundColor()
     }
 
     private fun initializeAccessibilityTextTitles(styledAttributes: TypedArray) {
@@ -77,24 +95,37 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
                         .filterNotNull()
 
         setContentDescriptions(navigationItemViews)
+        navigationItemViews[selectedTab].isSelected = true
 
         navigationItemViews.forEach { btmNavItem ->
             btmNavItem.setOnClickListener {
-                val selectedTabIndex = indexOfClickedViewChild(it)
-                setContentDescriptions(navigationItemViews, selectedTabIndex)
+                selectedTab = (btmNavItem as BottomNavigationItemView).itemPosition
+                setContentDescriptions(navigationItemViews)
                 announceForAccessibility(it.contentDescription)
                 with(createRevealAnimator(it)) {
                     start()
-
-                    //does not work for now
-                    //addListener(BetterBottomBarCircularRevealListener(overlayView, this@BetterBottomBar, colorIntArray[selectedTabIndex]))
+                    addListener(
+                            withCircularRevealListener(
+                                    onTerminate = {
+                                        removeOverlay()
+                                        setBackgroundColor()
+                                    })
+                    )
                 }
             }
         }
     }
 
+    private fun removeOverlay() {
+        removeView(overlayView)
+        overlayView = null
+    }
+
+    private fun setBackgroundColor() {
+        backgroundColor = colorIntArray[selectedTab]
+    }
+
     private fun createRevealAnimator(clickedView: View): Animator {
-        indexOfChild = indexOfClickedViewChild(clickedView)
         val clickedViewRectXPos = Rect()
         clickedView.getGlobalVisibleRect(clickedViewRectXPos)
         val xPosClickedView = clickedViewRectXPos.left
@@ -104,26 +135,24 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
         return createCircularReveal(
                 overlayView,
                 xPos,
-                CENTER_Y,
+                height / 2,
                 START_RADIUS,
                 xPos.coerceAtLeast(remainingWidth).toFloat()
         ).apply { duration = ANIMATION_DURATION }
     }
 
-    private fun indexOfClickedViewChild(clickedView: View) = (clickedView.parent as? ViewGroup)?.indexOfChild(clickedView) ?: INVALID_REFERENCE
-
-    private fun setContentDescriptions(navigationItemViews: List<ViewGroup>, selectedTabIndex: Int = 0) {
+    private fun setContentDescriptions(navigationItemViews: List<ViewGroup>) {
         navigationItemViews.forEach { viewGroup ->
             val btmNavItem = viewGroup as BottomNavigationItemView
 
             val title = getAccessibilityTitle(btmNavItem)
-            val isSelectedText = if (btmNavItem.isSelected || btmNavItem.itemPosition == selectedTabIndex) SELECTED_ACC_TEXT else ""
+            val isSelectedText = if (btmNavItem.isSelected || btmNavItem.itemPosition == selectedTab) SELECTED_ACC_TEXT else ""
 
             btmNavItem.contentDescription = "$title $TAB_ACC_TEXT ${btmNavItem.itemPosition + 1} $OF_ACC_TEXT ${navigationItemViews.size} $isSelectedText"
         }
     }
 
-    fun getAccessibilityTitle(btmNavItem: BottomNavigationItemView): String =
+    private fun getAccessibilityTitle(btmNavItem: BottomNavigationItemView): String =
             if (contentDescriptionTitles.isNotEmpty()) {
                 contentDescriptionTitles[btmNavItem.itemPosition]
             } else {

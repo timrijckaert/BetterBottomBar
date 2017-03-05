@@ -2,7 +2,7 @@
 
 Trying to fix the biggest let down view in the Android design lib.  
 _Everything_ wrong with [BottomNavigationView](https://developer.android.com/reference/android/support/design/widget/BottomNavigationView.html).  
-This contains fixes for missing **accessibility** and the **colorful transition** on tab change.
+This contains fixes for missing **save state**, **accessibility** and the **colorful transition** on tab change.
 
 <img src="img/bottombar_material_io.gif"></img>
 
@@ -24,6 +24,18 @@ Just like your regular `BottomNavigationView` you can inflate your custom menu.
         app:itemIconTint="@color/white"
         app:itemTextColor="@color/white"
         app:menu="@menu/bottom_navigation_main"/>
+```
+
+###Save State
+
+<img src="img/save_state.gif"></img>
+
+On rotation the correct color is still applied to your view.
+You can also access the `selectedTab` index via code.
+
+```java
+final BetterBottomBar betterBottomBar = (BetterBottomBar) findViewById(R.id.bottom_navigation);
+betterBottomBar.getSelectedTab();
 ```
 
 ###Color Animation
