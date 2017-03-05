@@ -4,7 +4,6 @@ import android.animation.Animator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.TypedArray
-import android.graphics.Color.*
 import android.graphics.Rect
 import android.os.Bundle
 import android.os.Parcelable
@@ -29,7 +28,7 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
     private val INVALID_REFERENCE = 0
     private val SELECTED_TAB_INDEX = "be.rijckaert.tim.library.BetterBottomBar.SELECTED_TAB_INDEX"
 
-    private var colorIntArray = intArrayOf(RED, GREEN, BLUE, RED, GREEN, BLUE)
+    private var colorIntArray = emptyArray<Int>()
     private var contentDescriptionTitles = emptyArray<String>()
     private var overlayView: View? = null
         get() {
@@ -38,7 +37,7 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
             }
 
             field = View(context).apply {
-                backgroundColor = colorIntArray[selectedTab]
+                backgroundColor = currentBackgroundColor
                 layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dip(BOTTOM_BAR_HEIGHT_DP).toInt())
             }
 
@@ -47,6 +46,8 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
         }
     var selectedTab = 0
         private set
+    private val currentBackgroundColor
+        get() = colorIntArray.takeIf { it.isNotEmpty() }?.get(selectedTab) ?: (background as ColorDrawable).color
 
     private val SELECTED_ACC_TEXT by lazy { context.getString(R.string.acc_was_selected) }
     private val TAB_ACC_TEXT by lazy { context.getString(R.string.acc_tab) }
@@ -84,7 +85,7 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
     private fun initializeColors(styledAttributes: TypedArray) {
         val colors = styledAttributes.getResourceId(R.styleable.BetterBottomBar_colors, INVALID_REFERENCE)
         if (colors != INVALID_REFERENCE) {
-            colorIntArray = resources.getIntArray(colors)
+            colorIntArray = resources.getIntArray(colors).toTypedArray()
         }
     }
 
@@ -122,7 +123,7 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
     }
 
     private fun setBackgroundColor() {
-        backgroundColor = colorIntArray[selectedTab]
+        backgroundColor = currentBackgroundColor
     }
 
     private fun createRevealAnimator(clickedView: View): Animator {

@@ -45,6 +45,8 @@ betterBottomBar.getSelectedTab();
 You can change the default colors with the `app:colors` attribute.  
 Make sure to reference an `IntArray` of colors
 
+When no color array has been added, no animation will happen.
+
 ```xml
 <be.rijckaert.tim.library.BetterBottomBar
         android:layout_width="match_parent"
