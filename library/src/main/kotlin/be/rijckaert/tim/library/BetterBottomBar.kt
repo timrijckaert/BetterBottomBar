@@ -47,7 +47,7 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
     var selectedTab = 0
         private set
     private val currentBackgroundColor
-        get() = colorIntArray.takeIf { it.isNotEmpty() }?.get(selectedTab) ?: (background as ColorDrawable).color
+        get() = colorIntArray.takeIf { it.isNotEmpty() }?.get(selectedTab) ?: (background as android.graphics.drawable.ColorDrawable).color
 
     private val SELECTED_ACC_TEXT by lazy { context.getString(R.string.acc_was_selected) }
     private val TAB_ACC_TEXT by lazy { context.getString(R.string.acc_tab) }

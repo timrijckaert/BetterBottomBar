@@ -7,6 +7,15 @@ buildscript {
         android_support_version = "25.2.0"
 
         anko_version = "0.9"
+
+        //Testing
+        junit_version = "4.12"
+
+        espresso_version = "2.2.2"
+        espresso_runner_version = "0.5"
+
+        mockito_kotlin_version = "1.2.0"
+        mockito_android_version = "2.7.5"
     }
 
     ext.libraries = [
@@ -18,7 +27,23 @@ buildscript {
                     "org.jetbrains.anko:anko-support-v4:$anko_version",
                     "org.jetbrains.anko:anko-appcompat-v7:$anko_version",
                     "org.jetbrains.anko:anko-design:$anko_version"
-            ]
+            ],
+
+            //Testing
+            junit                  : "junit:junit:$junit_version",
+            espresso               : [
+                    dependencies.create("com.android.support.test.espresso:espresso-core:$espresso_version") {
+                        exclude group: 'com.android.support', module: 'support-annotations'
+                    },
+                    dependencies.create("com.android.support.test:runner:$espresso_runner_version") {
+                        exclude group: 'com.android.support', module: 'support-annotations'
+                    }
+            ],
+            mockito_kotlin         :
+                    dependencies.create("com.nhaarman:mockito-kotlin:$mockito_kotlin_version") {
+                        exclude group: 'org.jetbrains.kotlin'
+                    },
+            mockito_android        : "org.mockito:mockito-android:$mockito_android_version"
     ]
 
     repositories {

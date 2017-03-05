@@ -22,13 +22,29 @@ android {
 
     sourceSets {
         main.java.srcDirs += 'src/main/kotlin'
+        androidTest.java.srcDirs += 'src/androidTest/kotlin'
     }
+}
+
+kapt {
+    generateStubs = true
 }
 
 dependencies {
     compile(
             libraries.android_appcompat,
             libraries.kotlin
+    )
+
+    testCompile(
+            libraries.junit,
+            libraries.mockito_kotlin
+    )
+
+    androidTestCompile(
+            libraries.espresso,
+            libraries.mockito_kotlin,
+            libraries.mockito_android
     )
 
     compile project(':library')
