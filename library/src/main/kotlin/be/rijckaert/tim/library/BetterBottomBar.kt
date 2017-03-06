@@ -70,6 +70,8 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
         initializeAccessibilityTextTitles(styledAttributes)
         styledAttributes.recycle()
 
+        setTextColors()
+        setIconColors()
         setWillNotDraw(true)
         prepareBottomNavigationItems()
     }
