@@ -36,7 +36,7 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
     var iconColors = emptyArray<ColorStateList>()
     var colors = emptyArray<Int>()
     var contentDescriptionTitles = emptyArray<String>()
-    var betterBottomBarClickListener: (BottomNavigationItemView) -> Unit = {}
+    var betterBottomBarClickListener: (BottomNavigationItemView, Int) -> Unit = { btmNav, index -> }
 
     private val navigationMenu by lazy { getChildAt(0) as BottomNavigationMenuView }
     private var overlayView: View? = null
@@ -85,6 +85,8 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
         selectedTab = (state as Bundle).getInt(SELECTED_TAB_INDEX)
         prepareBottomNavigationItems()
         setBackgroundColor()
+        setIconColors()
+        setTextColors()
     }
     //</editor-fold>
 
@@ -93,7 +95,9 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
         val textColorRes = arrayListOf(
                 R.styleable.BetterBottomBar_firstTabTextColors,
                 R.styleable.BetterBottomBar_secondTabTextColors,
-                R.styleable.BetterBottomBar_thirdTabTextColors
+                R.styleable.BetterBottomBar_thirdTabTextColors,
+                R.styleable.BetterBottomBar_fourthTabTextColors,
+                R.styleable.BetterBottomBar_fifthTabTextColors
         )
 
         textColors = textColorRes
@@ -105,7 +109,9 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
         val iconColorRes = arrayListOf(
                 R.styleable.BetterBottomBar_firstTabIconColors,
                 R.styleable.BetterBottomBar_secondTabIconColors,
-                R.styleable.BetterBottomBar_thirdTabIconColors
+                R.styleable.BetterBottomBar_thirdTabIconColors,
+                R.styleable.BetterBottomBar_fourthTabIconColors,
+                R.styleable.BetterBottomBar_fifthTabIconColors
         )
 
         iconColors = iconColorRes
@@ -128,6 +134,24 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
     }
     //</editor-fold>
 
+    //<editor-fold desc="View Modification">
+    private fun setIconColors() {
+        iconColors.getOrNull(selectedTab)?.let {
+            navigationMenu.iconTintList = it
+        }
+    }
+
+    private fun setTextColors() {
+        textColors.getOrNull(selectedTab)?.let {
+            navigationMenu.itemTextColor = it
+        }
+    }
+
+    private fun setBackgroundColor() {
+        backgroundColor = currentBackgroundColor
+    }
+    //</editor-fold>
+
     private fun prepareBottomNavigationItems() {
         val navigationItemViews =
                 getAllViewGroups()
@@ -140,14 +164,16 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
         navigationItemViews.forEach { btmNavItem ->
             btmNavItem.setOnClickListener {
                 val clickedBtmNavItem = btmNavItem as BottomNavigationItemView
-                betterBottomBarClickListener(clickedBtmNavItem)
                 selectedTab = clickedBtmNavItem.itemPosition
+
                 menu.getItem(selectedTab).isChecked = true
+                betterBottomBarClickListener(clickedBtmNavItem, selectedTab)
+
                 setContentDescriptions(navigationItemViews)
                 announceForAccessibility(it.contentDescription)
 
-                setCorrectTextColors()
-                setCorrectIconColors()
+                setTextColors()
+                setIconColors()
 
                 with(createRevealAnimator(it)) {
                     start()
@@ -163,25 +189,9 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
         }
     }
 
-    private fun setCorrectIconColors() {
-        iconColors.getOrNull(selectedTab)?.let {
-            navigationMenu.iconTintList = it
-        }
-    }
-
-    private fun setCorrectTextColors() {
-        textColors.getOrNull(selectedTab)?.let {
-            navigationMenu.itemTextColor = it
-        }
-    }
-
     private fun removeOverlay() {
         removeView(overlayView)
         overlayView = null
-    }
-
-    private fun setBackgroundColor() {
-        backgroundColor = currentBackgroundColor
     }
 
     private fun createRevealAnimator(clickedView: View): Animator {

@@ -7,9 +7,13 @@
         <attr name="firstTabTextColors" format="reference" />
         <attr name="secondTabTextColors" format="reference" />
         <attr name="thirdTabTextColors" format="reference" />
+        <attr name="fourthTabTextColors" format="reference" />
+        <attr name="fifthTabTextColors" format="reference" />
 
         <attr name="firstTabIconColors" format="reference" />
         <attr name="secondTabIconColors" format="reference" />
         <attr name="thirdTabIconColors" format="reference" />
+        <attr name="fourthTabIconColors" format="reference" />
+        <attr name="fifthTabIconColors" format="reference" />
     </declare-styleable>
 </resources>

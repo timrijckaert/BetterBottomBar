@@ -1,4 +1,4 @@
-#Better BottomNavigationView
+# Better BottomNavigationView
 
 Trying to fix the biggest let down view in the Android design lib.  
 _Everything_ wrong with [BottomNavigationView](https://developer.android.com/reference/android/support/design/widget/BottomNavigationView.html).  
@@ -6,7 +6,7 @@ This contains fixes for missing **save state**, **accessibility** and the **colo
 
 <img src="img/bottombar_material_io.gif"></img>
 
-##Basic usage
+## Basic usage
 
 The view is written in Kotlin, but you can safely use it in your trusty old Java project if you are willing to import the Kotlin Standard library.
 See the [example](https://github.com/timrijckaert/BetterBottomBar/blob/master/app/src/main/kotlin/be/rijckaert/tim/betterbottombar/MainActivity.java).
@@ -26,11 +26,42 @@ Just like your regular `BottomNavigationView` you can inflate your custom menu.
         app:menu="@menu/bottom_navigation_main"/>
 ```
 
-###Save State
+### Text Colors And Icon Drawable
+
+You can alter the text colors for each tab with the help of the `app:XXXXTabTextColors`.   
+For example for the first tab you should use `app:firstTabTextColors`.  
+just provide your custom `ColorStateList`
+
+See the sample if you need more explanation
+
+```xml
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item
+        android:color="@color/textColorPrimary"
+        android:state_checked="true"/>
+    <item
+        android:color="@color/textColorPrimaryUnselected"
+        android:state_checked="false"/>
+</selector>
+```
+
+Same for the icon drawable just use the `app:XXXTabIconColors`
+
+### Tab Change Listener
+
+In order to receive tab change events you should attach a `betterBottomBarClickListener`.
+
+```kotlin
+betterBottomBar.betterBottomBarClickListener = { btmNav, selectedTabPos ->
+    //get state
+}
+```
+
+### Save State
 
 <img src="img/save_state.gif"></img>
 
-On rotation the correct color is still applied to your view.
+On rotation all the correct color are still applied to your view.
 You can also access the `selectedTab` index via code.
 
 ```java
@@ -38,7 +69,7 @@ final BetterBottomBar betterBottomBar = (BetterBottomBar) findViewById(R.id.bott
 betterBottomBar.getSelectedTab();
 ```
 
-###Color Animation
+### Color Animation
 
 <img src="img/sample.gif"></img>
 
@@ -74,7 +105,7 @@ When no color array has been added, no animation will happen.
 
 <img src="img/accessibility.gif"></img>
 
-You can add accessibility to your `BottomNavigationView` by adding the `app:accessibilityTitles` attribute whichs refs to a `StringArray`.  
+You can add accessibility to your `BottomNavigationView` by adding the `app:contentDescriptionTitles` attribute whichs refs to a `StringArray`.  
 If you forget to do this. The view will use reflection to look for your titles.  
 Don't be a dick just provide them.
 
@@ -87,7 +118,7 @@ Don't be a dick just provide them.
         android:layout_gravity="bottom"
         app:itemIconTint="@color/white"
         app:itemTextColor="@color/white"
-        app:accessibilityTitles="@array/better_bottom_bar_accessibility_title"
+        app:contentDescriptionTitles="@array/better_bottom_bar_accessibility_title"
         app:menu="@menu/bottom_navigation_main"/>
 ```
 
@@ -105,4 +136,4 @@ At the moment it only supports:
  * English
  * Dutch
 
- Feel free to submit PR for more language support
+Feel free to submit PR for more language support
