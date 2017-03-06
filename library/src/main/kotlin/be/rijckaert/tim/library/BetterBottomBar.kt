@@ -8,7 +8,9 @@ import android.graphics.Rect
 import android.os.Bundle
 import android.os.Parcelable
 import android.support.design.internal.BottomNavigationItemView
+import android.support.design.internal.BottomNavigationMenuView
 import android.support.design.widget.BottomNavigationView
+import android.support.design.widget.CoordinatorLayout.DefaultBehavior
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewAnimationUtils.createCircularReveal
@@ -18,6 +20,7 @@ import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.dip
 
 @SuppressLint("NewApi")
+@DefaultBehavior(BetterBottomBarDefaultBehavior::class)
 class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0)
     : BottomNavigationView(context, attrs, defStyle) {
 
@@ -28,8 +31,10 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
     private val INVALID_REFERENCE = 0
     private val SELECTED_TAB_INDEX = "be.rijckaert.tim.library.BetterBottomBar.SELECTED_TAB_INDEX"
 
-    private var colorIntArray = emptyArray<Int>()
-    private var contentDescriptionTitles = emptyArray<String>()
+    var colors = emptyArray<Int>()
+    var contentDescriptionTitles = emptyArray<String>()
+
+    private val navigationMenu by lazy { getChildAt(0) as BottomNavigationMenuView }
     private var overlayView: View? = null
         get() {
             if (field != null) {
@@ -47,7 +52,7 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
     var selectedTab = 0
         private set
     private val currentBackgroundColor
-        get() = colorIntArray.takeIf { it.isNotEmpty() }?.get(selectedTab) ?: (background as android.graphics.drawable.ColorDrawable).color
+        get() = colors.takeIf { it.isNotEmpty() }?.get(selectedTab) ?: (background as android.graphics.drawable.ColorDrawable).color
 
     private val SELECTED_ACC_TEXT by lazy { context.getString(R.string.acc_was_selected) }
     private val TAB_ACC_TEXT by lazy { context.getString(R.string.acc_tab) }
@@ -76,7 +81,7 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
     }
 
     private fun initializeAccessibilityTextTitles(styledAttributes: TypedArray) {
-        val titles = styledAttributes.getResourceId(R.styleable.BetterBottomBar_accessibilityTitles, INVALID_REFERENCE)
+        val titles = styledAttributes.getResourceId(R.styleable.BetterBottomBar_contentDescriptionTitles, INVALID_REFERENCE)
         if (titles != INVALID_REFERENCE) {
             contentDescriptionTitles = resources.getStringArray(titles)
         }
@@ -85,7 +90,7 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
     private fun initializeColors(styledAttributes: TypedArray) {
         val colors = styledAttributes.getResourceId(R.styleable.BetterBottomBar_colors, INVALID_REFERENCE)
         if (colors != INVALID_REFERENCE) {
-            colorIntArray = resources.getIntArray(colors).toTypedArray()
+            this.colors = resources.getIntArray(colors).toTypedArray()
         }
     }
 
@@ -96,11 +101,12 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
                         .filterNotNull()
 
         setContentDescriptions(navigationItemViews)
-        navigationItemViews[selectedTab].isSelected = true
+        navigationItemViews.getOrNull(selectedTab)?.isSelected = true
 
         navigationItemViews.forEach { btmNavItem ->
             btmNavItem.setOnClickListener {
                 selectedTab = (btmNavItem as BottomNavigationItemView).itemPosition
+                menu.getItem(selectedTab).isChecked = true
                 setContentDescriptions(navigationItemViews)
                 announceForAccessibility(it.contentDescription)
                 with(createRevealAnimator(it)) {
