@@ -3,5 +3,13 @@
     <declare-styleable name="BetterBottomBar">
         <attr name="colors" format="reference" />
         <attr name="contentDescriptionTitles" format="reference" />
+
+        <attr name="firstTabTextColors" format="reference" />
+        <attr name="secondTabTextColors" format="reference" />
+        <attr name="thirdTabTextColors" format="reference" />
+
+        <attr name="firstTabIconColors" format="reference" />
+        <attr name="secondTabIconColors" format="reference" />
+        <attr name="thirdTabIconColors" format="reference" />
     </declare-styleable>
 </resources>

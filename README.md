@@ -8,7 +8,7 @@ This contains fixes for missing **save state**, **accessibility** and the **colo
 
 ##Basic usage
 
-The view is written in Kotlin, but you can safely use it in your trusty old Java project.  
+The view is written in Kotlin, but you can safely use it in your trusty old Java project if you are willing to import the Kotlin Standard library.
 See the [example](https://github.com/timrijckaert/BetterBottomBar/blob/master/app/src/main/kotlin/be/rijckaert/tim/betterbottombar/MainActivity.java).
 
 Basic Sample Usage.  

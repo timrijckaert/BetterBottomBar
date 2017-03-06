@@ -10,12 +10,18 @@
         android:id="@+id/bottom_navigation"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@color/colorPrimary"
         android:layout_alignParentBottom="true"
         android:layout_gravity="bottom"
-        app:itemIconTint="@color/white"
-        app:itemTextColor="@color/white"
+        android:background="@color/colorPrimary"
         app:colors="@array/bottom_bar_colors"
         app:contentDescriptionTitles="@array/better_bottom_bar_accessibility_title"
-        app:menu="@menu/bottom_navigation_main"/>
+        app:firstTabIconColors="@drawable/better_bottom_bar_news_icon_color_state_list"
+        app:firstTabTextColors="@drawable/better_bottom_bar_news_title_color_state_list"
+        app:itemIconTint="@color/white"
+        app:itemTextColor="@color/white"
+        app:menu="@menu/bottom_navigation_main"
+        app:secondTabIconColors="@drawable/better_bottom_bar_video_icon_color_state_list"
+        app:secondTabTextColors="@drawable/better_bottom_bar_video_title_color_state_list"
+        app:thirdTabIconColors="@drawable/better_bottom_bar_discover_icon_color_state_list"
+        app:thirdTabTextColors="@drawable/better_bottom_bar_discover_title_color_state_list"/>
 </RelativeLayout>

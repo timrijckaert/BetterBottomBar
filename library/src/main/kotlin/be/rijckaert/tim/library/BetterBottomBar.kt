@@ -3,7 +3,7 @@ package be.rijckaert.tim.library
 import android.animation.Animator
 import android.annotation.SuppressLint
 import android.content.Context
-import android.content.res.TypedArray
+import android.content.res.ColorStateList
 import android.graphics.Rect
 import android.os.Bundle
 import android.os.Parcelable
@@ -11,6 +11,7 @@ import android.support.design.internal.BottomNavigationItemView
 import android.support.design.internal.BottomNavigationMenuView
 import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.CoordinatorLayout.DefaultBehavior
+import android.support.v7.widget.TintTypedArray
 import android.util.AttributeSet
 import android.view.View
 import android.view.ViewAnimationUtils.createCircularReveal
@@ -31,9 +32,11 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
     private val INVALID_REFERENCE = 0
     private val SELECTED_TAB_INDEX = "be.rijckaert.tim.library.BetterBottomBar.SELECTED_TAB_INDEX"
 
+    var textColors = emptyArray<ColorStateList>()
+    var iconColors = emptyArray<ColorStateList>()
     var colors = emptyArray<Int>()
     var contentDescriptionTitles = emptyArray<String>()
-    var betterBottomBarClickListener : BetterBottomBarClickListener? = null
+    var betterBottomBarClickListener: (BottomNavigationItemView) -> Unit = {}
 
     private val navigationMenu by lazy { getChildAt(0) as BottomNavigationMenuView }
     private var overlayView: View? = null
@@ -60,7 +63,9 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
     private val OF_ACC_TEXT by lazy { context.getString(R.string.acc_of) }
 
     init {
-        val styledAttributes = context.theme.obtainStyledAttributes(attrs, R.styleable.BetterBottomBar, INVALID_REFERENCE, INVALID_REFERENCE)
+        val styledAttributes = TintTypedArray.obtainStyledAttributes(context, attrs, R.styleable.BetterBottomBar, 0, 0)
+        initializeTextColors(styledAttributes)
+        initializeIconColors(styledAttributes)
         initializeColors(styledAttributes)
         initializeAccessibilityTextTitles(styledAttributes)
         styledAttributes.recycle()
@@ -69,6 +74,7 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
         prepareBottomNavigationItems()
     }
 
+    //<editor-fold desc="View State">
     override fun onSaveInstanceState(): Parcelable {
         super.onSaveInstanceState()
         return Bundle().apply { putInt(SELECTED_TAB_INDEX, selectedTab) }
@@ -80,20 +86,47 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
         prepareBottomNavigationItems()
         setBackgroundColor()
     }
+    //</editor-fold>
 
-    private fun initializeAccessibilityTextTitles(styledAttributes: TypedArray) {
+    //<editor-fold desc="Styling">
+    private fun initializeTextColors(styledAttributes: TintTypedArray) {
+        val textColorRes = arrayListOf(
+                R.styleable.BetterBottomBar_firstTabTextColors,
+                R.styleable.BetterBottomBar_secondTabTextColors,
+                R.styleable.BetterBottomBar_thirdTabTextColors
+        )
+
+        textColors = textColorRes
+                .map { styledAttributes.getColorStateList(it) }
+                .toTypedArray()
+    }
+
+    private fun initializeIconColors(styledAttributes: TintTypedArray) {
+        val iconColorRes = arrayListOf(
+                R.styleable.BetterBottomBar_firstTabIconColors,
+                R.styleable.BetterBottomBar_secondTabIconColors,
+                R.styleable.BetterBottomBar_thirdTabIconColors
+        )
+
+        iconColors = iconColorRes
+                .map { styledAttributes.getColorStateList(it) }
+                .toTypedArray()
+    }
+
+    private fun initializeAccessibilityTextTitles(styledAttributes: TintTypedArray) {
         val titles = styledAttributes.getResourceId(R.styleable.BetterBottomBar_contentDescriptionTitles, INVALID_REFERENCE)
         if (titles != INVALID_REFERENCE) {
             contentDescriptionTitles = resources.getStringArray(titles)
         }
     }
 
-    private fun initializeColors(styledAttributes: TypedArray) {
+    private fun initializeColors(styledAttributes: TintTypedArray) {
         val colors = styledAttributes.getResourceId(R.styleable.BetterBottomBar_colors, INVALID_REFERENCE)
         if (colors != INVALID_REFERENCE) {
             this.colors = resources.getIntArray(colors).toTypedArray()
         }
     }
+    //</editor-fold>
 
     private fun prepareBottomNavigationItems() {
         val navigationItemViews =
@@ -107,11 +140,15 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
         navigationItemViews.forEach { btmNavItem ->
             btmNavItem.setOnClickListener {
                 val clickedBtmNavItem = btmNavItem as BottomNavigationItemView
-                betterBottomBarClickListener?.tabClicked(clickedBtmNavItem)
+                betterBottomBarClickListener(clickedBtmNavItem)
                 selectedTab = clickedBtmNavItem.itemPosition
                 menu.getItem(selectedTab).isChecked = true
                 setContentDescriptions(navigationItemViews)
                 announceForAccessibility(it.contentDescription)
+
+                setCorrectTextColors()
+                setCorrectIconColors()
+
                 with(createRevealAnimator(it)) {
                     start()
                     addListener(
@@ -123,6 +160,18 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
                     )
                 }
             }
+        }
+    }
+
+    private fun setCorrectIconColors() {
+        iconColors.getOrNull(selectedTab)?.let {
+            navigationMenu.iconTintList = it
+        }
+    }
+
+    private fun setCorrectTextColors() {
+        textColors.getOrNull(selectedTab)?.let {
+            navigationMenu.itemTextColor = it
         }
     }
 
@@ -169,8 +218,4 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
                 btmNavItem.javaClass.getDeclaredField(ACCESSIBILITY_VIEW).isAccessible = true
                 btmNavItem.itemData.title.toString()
             }
-
-    interface BetterBottomBarClickListener {
-        fun tabClicked(btmNavItem: BottomNavigationItemView)
-    }
 }
