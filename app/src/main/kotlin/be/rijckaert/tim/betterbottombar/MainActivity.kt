@@ -13,8 +13,7 @@ class MainActivity : AppCompatActivity() {
 
         betterBottomBar = findViewById(R.id.bottom_navigation) as BetterBottomBar
         betterBottomBar.betterBottomBarClickListener = { btmNav, selectedTabPos ->
-        betterBottomBar.betterBottomBarClickListener = { btmNav, selectedTabPos ->
-            //get state
+
         }
     }
 }
