@@ -16,6 +16,6 @@
         app:itemIconTint="@color/white"
         app:itemTextColor="@color/white"
         app:colors="@array/bottom_bar_colors"
-        app:accessibilityTitles="@array/better_bottom_bar_accessibility_title"
+        app:contentDescriptionTitles="@array/better_bottom_bar_accessibility_title"
         app:menu="@menu/bottom_navigation_main"/>
 </RelativeLayout>

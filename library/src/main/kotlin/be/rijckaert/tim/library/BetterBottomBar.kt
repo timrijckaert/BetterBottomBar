@@ -33,6 +33,7 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
 
     var colors = emptyArray<Int>()
     var contentDescriptionTitles = emptyArray<String>()
+    var betterBottomBarClickListener : BetterBottomBarClickListener? = null
 
     private val navigationMenu by lazy { getChildAt(0) as BottomNavigationMenuView }
     private var overlayView: View? = null
@@ -105,7 +106,9 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
 
         navigationItemViews.forEach { btmNavItem ->
             btmNavItem.setOnClickListener {
-                selectedTab = (btmNavItem as BottomNavigationItemView).itemPosition
+                val clickedBtmNavItem = btmNavItem as BottomNavigationItemView
+                betterBottomBarClickListener?.tabClicked(clickedBtmNavItem)
+                selectedTab = clickedBtmNavItem.itemPosition
                 menu.getItem(selectedTab).isChecked = true
                 setContentDescriptions(navigationItemViews)
                 announceForAccessibility(it.contentDescription)
@@ -166,4 +169,8 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
                 btmNavItem.javaClass.getDeclaredField(ACCESSIBILITY_VIEW).isAccessible = true
                 btmNavItem.itemData.title.toString()
             }
+
+    interface BetterBottomBarClickListener {
+        fun tabClicked(btmNavItem: BottomNavigationItemView)
+    }
 }
