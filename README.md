@@ -52,7 +52,7 @@ Same for the icon drawable just use the `app:XXXTabIconColors`
 In order to receive tab change events you should attach a `betterBottomBarClickListener`.
 
 ```kotlin
-betterBottomBar.betterBottomBarClickListener = { btmNav, selectedTabPos ->
+betterBottomBar.betterBottomBarClickListener = { betterBottomBar, menuItem ->
     //get state
 }
 ```
