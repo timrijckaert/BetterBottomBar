@@ -13,6 +13,7 @@ import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.CoordinatorLayout.DefaultBehavior
 import android.support.v7.widget.TintTypedArray
 import android.util.AttributeSet
+import android.view.MenuItem
 import android.view.View
 import android.view.ViewAnimationUtils.createCircularReveal
 import android.view.ViewGroup
@@ -36,7 +37,7 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
     var iconColors = emptyArray<ColorStateList>()
     var colors = emptyArray<Int>()
     var contentDescriptionTitles = emptyArray<String>()
-    var betterBottomBarClickListener: (BottomNavigationItemView, Int) -> Unit = { btmNav, index -> }
+    var betterBottomBarClickListener: (BetterBottomBar, MenuItem) -> Unit = { betterBotNav, index -> }
 
     private val navigationMenu by lazy { getChildAt(0) as BottomNavigationMenuView }
     private var overlayView: View? = null
@@ -169,7 +170,7 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
                 selectedTab = clickedBtmNavItem.itemPosition
 
                 menu.getItem(selectedTab).isChecked = true
-                betterBottomBarClickListener(clickedBtmNavItem, selectedTab)
+                betterBottomBarClickListener(this, menu.getItem(selectedTab))
 
                 setContentDescriptions(navigationItemViews)
                 announceForAccessibility(it.contentDescription)
