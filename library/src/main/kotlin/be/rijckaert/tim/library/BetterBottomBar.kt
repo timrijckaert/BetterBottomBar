@@ -86,6 +86,8 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
     override fun onRestoreInstanceState(state: Parcelable?) {
         super.onRestoreInstanceState(null)
         selectedTab = (state as Bundle).getInt(SELECTED_TAB_INDEX)
+
+        menu.getItem(selectedTab).isChecked = true
         prepareBottomNavigationItems()
         setBackgroundColor()
         setIconColors()
