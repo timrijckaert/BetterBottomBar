@@ -4,13 +4,16 @@ import android.animation.Animator
 import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
+import android.graphics.Canvas
 import android.graphics.Rect
+import android.graphics.Region
 import android.os.Bundle
 import android.os.Parcelable
 import android.support.design.internal.BottomNavigationItemView
 import android.support.design.internal.BottomNavigationMenuView
 import android.support.design.widget.BottomNavigationView
 import android.support.design.widget.CoordinatorLayout.DefaultBehavior
+import android.support.v4.content.ContextCompat.getDrawable
 import android.support.v7.widget.TintTypedArray
 import android.util.AttributeSet
 import android.view.View
@@ -19,6 +22,8 @@ import android.view.ViewGroup
 import be.rijckaert.tim.library.AnimatorListenerAdapter.Companion.withCircularRevealListener
 import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.dip
+import org.jetbrains.anko.topPadding
+
 
 @SuppressLint("NewApi")
 @DefaultBehavior(BetterBottomBarDefaultBehavior::class)
@@ -47,7 +52,7 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
 
             field = View(context).apply {
                 backgroundColor = currentBackgroundColor
-                layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dip(BOTTOM_BAR_HEIGHT_DP).toInt())
+                layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, dip(BOTTOM_BAR_HEIGHT_DP))
             }
 
             addView(field, INVALID_REFERENCE)
@@ -62,6 +67,9 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
     private val TAB_ACC_TEXT by lazy { context.getString(R.string.acc_tab) }
     private val OF_ACC_TEXT by lazy { context.getString(R.string.acc_of) }
 
+    private val TOP_PADDING by lazy { dip(3) }
+    private val SHADOW_DRAWABLE by lazy { getDrawable(context, R.drawable.shadow) }
+
     init {
         val styledAttributes = TintTypedArray.obtainStyledAttributes(context, attrs, R.styleable.BetterBottomBar, 0, 0)
         initializeTextColors(styledAttributes)
@@ -70,10 +78,25 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
         initializeAccessibilityTextTitles(styledAttributes)
         styledAttributes.recycle()
 
+        setPadding(0, TOP_PADDING, 0, 0)
+
         setTextColors()
         setIconColors()
-        setWillNotDraw(true)
+        setWillNotDraw(false)
         prepareBottomNavigationItems()
+    }
+
+    override fun dispatchDraw(canvas: Canvas) {
+        super.dispatchDraw(canvas)
+
+        val newRect = canvas.clipBounds
+        newRect.inset(0, -topPadding)
+        canvas.clipRect(newRect, Region.Op.REPLACE)
+
+        SHADOW_DRAWABLE.apply {
+            setBounds(0, -topPadding, right, 0)
+            draw(canvas)
+        }
     }
 
     //<editor-fold desc="View State">
@@ -90,7 +113,7 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
         setIconColors()
         setTextColors()
     }
-    //</editor-fold>
+//</editor-fold>
 
     //<editor-fold desc="Styling">
     private fun initializeTextColors(styledAttributes: TintTypedArray) {
@@ -134,7 +157,7 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
             this.colors = resources.getIntArray(colors).toTypedArray()
         }
     }
-    //</editor-fold>
+//</editor-fold>
 
     //<editor-fold desc="View Modification">
     private fun setIconColors() {
@@ -152,7 +175,7 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
     private fun setBackgroundColor() {
         backgroundColor = currentBackgroundColor
     }
-    //</editor-fold>
+//</editor-fold>
 
     private fun prepareBottomNavigationItems() {
         val navigationItemViews =
