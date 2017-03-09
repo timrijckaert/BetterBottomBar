@@ -5,6 +5,8 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.content.res.ColorStateList
 import android.graphics.Rect
+import android.os.Build
+import android.os.Build.VERSION_CODES.LOLLIPOP
 import android.os.Bundle
 import android.os.Parcelable
 import android.support.design.internal.BottomNavigationItemView
@@ -21,7 +23,6 @@ import be.rijckaert.tim.library.AnimatorListenerAdapter.Companion.withCircularRe
 import org.jetbrains.anko.backgroundColor
 import org.jetbrains.anko.dip
 
-@SuppressLint("NewApi")
 @DefaultBehavior(BetterBottomBarDefaultBehavior::class)
 class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: AttributeSet? = null, defStyle: Int = 0)
     : BottomNavigationView(context, attrs, defStyle) {
@@ -37,7 +38,7 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
     var iconColors = emptyArray<ColorStateList>()
     var colors = emptyArray<Int>()
     var contentDescriptionTitles = emptyArray<String>()
-    var betterBottomBarClickListener: (BetterBottomBar, MenuItem) -> Unit = { betterBotNav, index -> }
+    var betterBottomBarClickListener: ((BetterBottomBar, MenuItem) -> Unit)? = null
 
     private val navigationMenu by lazy { getChildAt(0) as BottomNavigationMenuView }
     private var overlayView: View? = null
@@ -172,7 +173,7 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
                 selectedTab = clickedBtmNavItem.itemPosition
 
                 menu.getItem(selectedTab).isChecked = true
-                betterBottomBarClickListener(this, menu.getItem(selectedTab))
+                betterBottomBarClickListener?.invoke(this, menu.getItem(selectedTab))
 
                 setContentDescriptions(navigationItemViews)
                 announceForAccessibility(it.contentDescription)
@@ -180,15 +181,19 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
                 setTextColors()
                 setIconColors()
 
-                with(createRevealAnimator(it)) {
-                    start()
-                    addListener(
-                            withCircularRevealListener(
-                                    onTerminate = {
-                                        removeOverlay()
-                                        setBackgroundColor()
-                                    })
-                    )
+                if (Build.VERSION.SDK_INT >= LOLLIPOP) {
+                    with(createRevealAnimator(it)) {
+                        start()
+                        addListener(
+                                withCircularRevealListener(
+                                        onTerminate = {
+                                            removeOverlay()
+                                            setBackgroundColor()
+                                        })
+                        )
+                    }
+                } else {
+                    setBackgroundColor()
                 }
             }
         }
@@ -199,6 +204,7 @@ class BetterBottomBar @JvmOverloads constructor(context: Context, attrs: Attribu
         overlayView = null
     }
 
+    @SuppressLint("NewApi")
     private fun createRevealAnimator(clickedView: View): Animator {
         val clickedViewRectXPos = Rect()
         clickedView.getGlobalVisibleRect(clickedViewRectXPos)
